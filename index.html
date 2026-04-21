@@ -1,0 +1,619 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Investment Portfolio Dashboard | Client Edition</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <script src="https://cdn.sheetjs.com/xlsx-0.20.2/package/dist/xlsx.full.min.js"></script>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Inter', sans-serif; background: #f5f9ff; color: #1e293b; padding: 24px 32px; line-height: 1.5; }
+    .dashboard { max-width: 1800px; margin: 0 auto; }
+    .dashboard-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 28px; }
+    h1 { font-weight: 600; font-size: 28px; color: #0f1825; display: flex; align-items: center; gap: 12px; }
+    .badge-date { background: white; padding: 8px 18px; border-radius: 40px; font-size: 14px; font-weight: 500; box-shadow: 0 2px 6px rgba(0,0,0,0.02); border: 1px solid #e2e8f0; }
+    .overview-card { background: #ffffff; border-radius: 24px; padding: 24px 28px; box-shadow: 0 8px 20px -6px rgba(0,20,60,0.08); border: 1px solid #eef2f6; margin-bottom: 24px; }
+    .client-row { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; margin-bottom: 20px; padding-bottom: 16px; border-bottom: 1px solid #e9edf2; }
+    .client-name-area { display: flex; align-items: center; gap: 20px; flex-wrap: wrap; }
+    .client-label { font-size: 16px; font-weight: 500; color: #5b6c85; }
+    .client-value-input { font-size: 20px; font-weight: 600; color: #0b1c34; border: 1px solid #d0ddee; border-radius: 12px; padding: 8px 16px; width: 260px; background: #fbfdff; }
+    .currency-selector { display: flex; align-items: center; gap: 12px; background: #f8fafd; padding: 6px 16px 6px 20px; border-radius: 40px; border: 1px solid #dce3ec; }
+    .currency-selector select { background: transparent; border: none; font-size: 15px; font-weight: 500; padding: 8px 4px; outline: none; cursor: pointer; }
+    .ex-rate { font-size: 13px; color: #1e4c8f; margin-left: 8px; }
+    .api-key-area { display: flex; align-items: center; gap: 12px; margin-left: 20px; }
+    .api-key-input { width: 260px; padding: 8px 12px; border-radius: 30px; border: 1px solid #cbd6e6; }
+    .github-config { display: flex; flex-wrap: wrap; gap: 12px; margin: 16px 0; padding: 16px; background: #f0f5ff; border-radius: 20px; }
+    .index-ticker { display: flex; gap: 28px; flex-wrap: wrap; margin: 16px 0 8px; padding: 12px 16px; background: #f2f7ff; border-radius: 20px; }
+    .index-item { display: flex; align-items: center; gap: 8px; font-size: 14px; font-weight: 500; flex-wrap: wrap; }
+    .index-value { font-weight: 600; }
+    .index-change { display: flex; gap: 8px; }
+    .positive { color: #0e8240; }
+    .negative { color: #cf222e; }
+    .metric-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; margin-bottom: 24px; }
+    .metric-item { background: #fafcff; border-radius: 20px; padding: 20px 22px; border: 1px solid #e6ecf3; }
+    .metric-label { font-size: 15px; font-weight: 500; color: #52658c; margin-bottom: 10px; }
+    .metric-value { font-size: 34px; font-weight: 600; color: #0b1f3b; }
+    .cash-capital-row { display: flex; flex-wrap: wrap; gap: 40px 80px; margin-top: 10px; }
+    .cash-item { display: flex; align-items: baseline; gap: 16px; }
+    .cash-item .label { font-weight: 500; color: #475e7c; min-width: 260px; }
+    .cash-item .number { font-size: 24px; font-weight: 600; color: #1e3a5f; }
+    .initial-capital-input { width: 200px; font-size: 20px; padding: 6px 12px; border-radius: 12px; border: 1px solid #cbd6e6; background: white; font-weight: 600; }
+    .section-title { font-size: 20px; font-weight: 600; margin: 36px 0 18px; display: flex; align-items: center; gap: 10px; }
+    .table-wrapper { background: white; border-radius: 20px; padding: 4px; box-shadow: 0 6px 14px rgba(0,0,0,0.02); border: 1px solid #e2eaf2; overflow-x: auto; margin-bottom: 20px; }
+    table { width: 100%; border-collapse: collapse; font-size: 14px; min-width: 1500px; }
+    th { text-align: left; padding: 16px; background: #f9fbfe; font-weight: 600; color: #25455b; border-bottom: 1px solid #d9e2ec; white-space: nowrap; cursor: pointer; user-select: none; }
+    th i { margin-left: 6px; opacity: 0.6; font-size: 12px; }
+    td { padding: 14px 16px; border-bottom: 1px solid #eaeef4; vertical-align: middle; }
+    .symbol-badge { background: #e5ebf5; padding: 4px 10px; border-radius: 30px; font-weight: 500; }
+    .type-tag { background: #eef2f9; padding: 4px 10px; border-radius: 30px; }
+    .btn { background: white; border: 1px solid #bdd1e8; border-radius: 30px; padding: 8px 18px; font-weight: 500; font-size: 14px; cursor: pointer; transition: all 0.1s; margin-right: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
+    .btn-primary { background: #1a4cff; border-color: #1a4cff; color: white; }
+    .btn-save { background: #0e8240; border-color: #0e8240; color: white; }
+    .refresh-price-btn { background: #0d2e6e; color: white; border-color: #0d2e6e; font-weight: 600; margin-left: 12px; }
+    .total-row { background: #f3f9fe; font-weight: 600; border-top: 2px solid #cbdae8; }
+    .fetch-btn { background: #e8f0fe; border-color: #1a4cff; color: #1a4cff; }
+    .loading-badge { background: #fff3cd; color: #856404; padding: 4px 12px; border-radius: 30px; font-size: 13px; }
+    select, input:not([type=checkbox]) { border: 1px solid #cbd6e6; border-radius: 8px; padding: 6px 10px; font-family: 'Inter', sans-serif; }
+    .footer-note { margin-top: 24px; color: #5c7592; font-size: 13px; text-align: right; border-top: 1px dashed #cddae8; padding-top: 18px; }
+    .charts-container { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin: 32px 0; }
+    .chart-card { background: white; border-radius: 20px; padding: 20px; border: 1px solid #e2eaf2; }
+    .timeframe-selector { display: flex; gap: 8px; flex-wrap: wrap; margin: 12px 0; }
+    .timeframe-btn { background: #f0f5ff; border: 1px solid #c7d9f0; border-radius: 30px; padding: 4px 12px; font-size: 13px; cursor: pointer; }
+    .timeframe-btn.active { background: #1a4cff; color: white; border-color: #1a4cff; }
+    #newsTable th, #newsTable td { white-space: normal; }
+    #newsTable a { color: #1a4cff; text-decoration: none; }
+    #newsTable a:hover { text-decoration: underline; }
+  </style>
+</head>
+<body>
+<div class="dashboard">
+  <div class="dashboard-header">
+    <h1><i class="fas fa-chart-pie"></i>Investment Portfolio Dashboard (Client)</h1>
+    <div class="badge-date"><i class="far fa-calendar-alt"></i> <span id="currentDateDisplay"></span></div>
+  </div>
+
+  <div class="overview-card">
+    <div class="client-row">
+      <div class="client-name-area">
+        <span class="client-label"><i class="fas fa-user-circle"></i>Client Name :</span>
+        <input type="text" id="clientNameInput" class="client-value-input" value="Ava Montgomery">
+        <span class="client-label"><i class="fas fa-dollar-sign"></i>Initial Capital (USD) :</span>
+        <input type="number" id="initialCapitalInput" class="initial-capital-input" value="18000000" step="1000" min="0">
+        <button class="btn fetch-btn" id="fetchLivePricesBtn"><i class="fas fa-cloud-download-alt"></i> Fetch Live Prices</button>
+        <button class="btn fetch-btn" id="fetchNewsBtn"><i class="fas fa-newspaper"></i> Fetch News</button>
+        <button class="btn refresh-price-btn" id="simulatePricesBtn"><i class="fas fa-sync-alt"></i> Simulate Prices</button>
+        <button class="btn btn-save" id="saveToGitHubBtn"><i class="fab fa-github"></i> Save to GitHub</button>
+        <span id="priceStatus" class="loading-badge" style="display:none;">Loading...</span>
+      </div>
+      <div class="currency-selector">
+        <i class="fas fa-coins"></i><span>Currency :</span>
+        <select id="currencySelect">
+          <option value="USD" selected>USD – US Dollar</option>
+          <option value="SGD">SGD – Singapore Dollar</option>
+          <option value="HKD">HKD – Hong Kong Dollar</option>
+          <option value="MYR">MYR – Malaysia Ringgit</option>
+        </select>
+        <span class="ex-rate" id="exchangeRateDisplay">1 USD = 1.00 USD</span>
+      </div>
+    </div>
+
+    <!-- GitHub Configuration -->
+    <div class="github-config">
+      <div><i class="fab fa-github"></i><span style="font-weight:500; margin-left:8px;">GitHub Sync:</span></div>
+      <input type="password" id="githubToken" placeholder="Personal Access Token (classic)" style="width:240px;">
+      <input type="text" id="githubOwner" placeholder="Owner (username)" style="width:160px;">
+      <input type="text" id="githubRepo" placeholder="Repository" style="width:160px;">
+      <input type="text" id="githubPath" placeholder="File path" value="portfolio_state.json" style="width:200px;">
+      <button class="btn btn-outline" id="loadFromGitHubBtn"><i class="fas fa-download"></i> Load from GitHub</button>
+      <button class="btn btn-outline" id="saveGitHubConfigBtn"><i class="fas fa-save"></i> Save Config</button>
+      <span id="githubStatus" style="font-size:13px;"></span>
+    </div>
+
+    <!-- API Keys -->
+    <div style="margin-bottom:16px;">
+      <div style="display:flex; align-items:center; padding:4px 0;">
+        <div class="api-key-area">
+          <label><i class="fas fa-key"></i> Twelve Data :</label>
+          <input type="password" id="apiKeyInput" class="api-key-input" placeholder="Twelve Data API Key">
+          <button class="btn btn-outline" id="saveApiKeyBtn">Save</button>
+          <span id="apiKeyStatus"></span>
+        </div>
+      </div>
+      <div style="display:flex; align-items:center; padding:4px 0;">
+        <div class="api-key-area">
+          <label><i class="fas fa-newspaper"></i> MarketAux :</label>
+          <input type="password" id="marketauxApiKeyInput" class="api-key-input" placeholder="MarketAux API Key">
+          <button class="btn btn-outline" id="saveMarketauxApiKeyBtn">Save</button>
+          <span id="marketauxApiKeyStatus"></span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Index Ticker -->
+    <div class="index-ticker">
+      <div class="index-item"><span>S&P 500</span> <span class="index-value" id="sp500">-</span><div class="index-change"><span id="sp500Points">-</span><span id="sp500Change">-</span></div></div>
+      <div class="index-item"><span>Nasdaq</span> <span class="index-value" id="nasdaq">-</span><div class="index-change"><span id="nasdaqPoints">-</span><span id="nasdaqChange">-</span></div></div>
+      <div class="index-item"><span>Dow Jones</span> <span class="index-value" id="dow">-</span><div class="index-change"><span id="dowPoints">-</span><span id="dowChange">-</span></div></div>
+      <div class="index-item"><span>VIX</span> <span class="index-value" id="vix">-</span><div class="index-change"><span id="vixPoints">-</span><span id="vixChange">-</span></div></div>
+    </div>
+
+    <!-- Metrics -->
+    <div class="metric-grid">
+      <div class="metric-item"><div class="metric-label">Total Portfolio Value</div><div class="metric-value" id="totalPortfolioValue">$0</div></div>
+      <div class="metric-item"><div class="metric-label">Total P/L (Value)</div><div class="metric-value" id="totalPLValueDisplay">$0</div></div>
+      <div class="metric-item"><div class="metric-label">Total P/L (%)</div><div class="metric-value" id="totalPLPercentDisplay">0%</div></div>
+    </div>
+    <div class="cash-capital-row">
+      <div class="cash-item"><span class="label">Outstanding Cash :</span><span class="number" id="outstandingCashDisplay">$0</span></div>
+    </div>
+  </div>
+
+  <!-- Charts -->
+  <div class="charts-container">
+    <div class="chart-card"><h3>Portfolio Value Trend</h3><div class="timeframe-selector" id="valueTimeframe"></div><canvas id="valueChart"></canvas></div>
+    <div class="chart-card"><h3>Total P/L Trend</h3><div class="timeframe-selector" id="plTimeframe"></div><canvas id="plChart"></canvas></div>
+  </div>
+
+  <!-- Holdings -->
+  <div class="section-title"><i class="fas fa-table"></i> Current Holdings</div>
+  <div class="table-wrapper"><table id="holdingsTable"><thead><tr id="holdingsHeaderRow"><th data-sort="name">Name <i class="fas fa-sort"></i></th><th data-sort="type">Type <i class="fas fa-sort"></i></th><th data-sort="symbol">Symbol <i class="fas fa-sort"></i></th><th data-sort="units">Units <i class="fas fa-sort"></i></th><th data-sort="buyDate">First Buy <i class="fas fa-sort"></i></th><th data-sort="avgCost">Avg Cost <i class="fas fa-sort"></i></th><th data-sort="totalCost">Total Cost <i class="fas fa-sort"></i></th><th data-sort="latestPrice">Price <i class="fas fa-sort"></i></th><th data-sort="marketValue">Mkt Value <i class="fas fa-sort"></i></th><th data-sort="plPercent">P/L% <i class="fas fa-sort"></i></th><th data-sort="plValue">P/L$ <i class="fas fa-sort"></i></th></tr></thead><tbody id="holdingsBody"></tbody></table></div>
+
+  <!-- News -->
+  <div class="section-title"><i class="fas fa-newspaper"></i> News Update</div>
+  <div class="table-wrapper"><table id="newsTable"><thead><tr><th>Symbol</th><th>Headline</th><th>Sentiment</th><th>Published</th></tr></thead><tbody id="newsBody"><tr><td colspan="4">Click "Fetch News"</td></tr></tbody></table></div>
+
+  <!-- Transactions -->
+  <div style="display:flex; justify-content:space-between; margin-top:20px;">
+    <div class="section-title"><i class="fas fa-history"></i> Transaction Record</div>
+    <div>
+      <button class="btn btn-outline" id="addTransactionBtn"><i class="fas fa-plus"></i> Add</button>
+      <button class="btn btn-outline" id="deleteSelectedBtn"><i class="fas fa-trash-alt"></i> Delete</button>
+      <button class="btn btn-outline" id="exportXLSBtn"><i class="fas fa-download"></i> Export XLS</button>
+      <button class="btn btn-outline" id="importXLSBtn" onclick="document.getElementById('xlsFileInput').click();"><i class="fas fa-upload"></i> Import XLS</button>
+      <input type="file" id="xlsFileInput" accept=".xlsx, .xls, .csv" style="display:none;">
+      <button class="btn btn-primary" id="refreshHoldingsFromTxBtn"><i class="fas fa-sync-alt"></i> Refresh Holdings</button>
+    </div>
+  </div>
+  <div class="table-wrapper">
+    <table id="transactionsTable">
+      <thead><tr id="txHeaderRow"><th><input type="checkbox" id="selectAllTx"></th><th data-sort="no">No <i class="fas fa-sort"></i></th><th data-sort="name">Name <i class="fas fa-sort"></i></th><th data-sort="symbol">Symbol <i class="fas fa-sort"></i></th><th data-sort="date">Date <i class="fas fa-sort"></i></th><th data-sort="type">Type <i class="fas fa-sort"></i></th><th data-sort="invType">Inv Type <i class="fas fa-sort"></i></th><th data-sort="qty">Qty <i class="fas fa-sort"></i></th><th data-sort="unitCost">Unit Cost <i class="fas fa-sort"></i></th><th data-sort="fee">Fee <i class="fas fa-sort"></i></th><th data-sort="totalCost">Total Cost <i class="fas fa-sort"></i></th><th data-sort="avgUnitCost">Avg Cost <i class="fas fa-sort"></i></th></tr></thead>
+      <tbody id="transactionsBody"></tbody>
+    </table>
+  </div>
+
+  <div class="footer-note">All settings (client name, initial capital, currency, transactions) are saved together in GitHub. Export/import via Excel.</div>
+</div>
+
+<script>
+  (function(){
+    "use strict";
+
+    // ---------- STATE ----------
+    let transactions = [];
+    let latestPrices = {};
+    let currencyRates = { USD:1, SGD:1.35, HKD:7.82, MYR:4.72 };
+    let currentCurrency = 'USD';
+    let holdingsSort = { column: null, asc: true };
+    let txSort = { column: null, asc: true };
+    let valueTimeframe = '6M', plTimeframe = '6M';
+    const priceHistoryCache = new Map();
+    let valueChart, plChart;
+
+    const defaultState = {
+      clientName: 'Ava Montgomery',
+      initialCapital: 18000000,
+      currency: 'USD',
+      latestPrices: { 'MSFT':372.38,'AAPL':273.15,'NVDA':201.68,'IEF':95.25,'GLD':440.99,'GOOGL':317.24,'PIMIX':10.88,'VTI':350.43 },
+      transactions: [
+        { id:1, name:'Microsoft', symbol:'MSFT', date:'2025-08-10', type:'BUY', invType:'Stock', qty:15000, unitCost:380, fee:10 },
+        { id:2, name:'Apple', symbol:'AAPL', date:'2025-09-15', type:'BUY', invType:'Stock', qty:22000, unitCost:175, fee:15 },
+        { id:3, name:'NVIDIA', symbol:'NVDA', date:'2025-10-01', type:'BUY', invType:'Stock', qty:8000, unitCost:850, fee:12 },
+        { id:4, name:'iShares Treasury', symbol:'IEF', date:'2025-11-10', type:'BUY', invType:'ETF', qty:40000, unitCost:94, fee:8 },
+        { id:5, name:'SPDR Gold', symbol:'GLD', date:'2026-01-18', type:'BUY', invType:'Commodity', qty:12300, unitCost:215.40, fee:10 }
+      ]
+    };
+
+    // ---------- UTILS ----------
+    function updateDateDisplay() {
+      const d = new Date();
+      document.getElementById('currentDateDisplay').textContent = d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+    }
+    function updateExchangeRateDisplay() {
+      const rate = currencyRates[currentCurrency] || 1;
+      document.getElementById('exchangeRateDisplay').textContent = `1 USD = ${rate.toFixed(4)} ${currentCurrency}`;
+    }
+    function formatCurrency(v){ let r = currencyRates[currentCurrency]||1; return new Intl.NumberFormat('en-US',{style:'currency',currency:currentCurrency,minimumFractionDigits:0}).format(v*r); }
+    function formatCurrencyCents(v){ let r = currencyRates[currentCurrency]||1; return new Intl.NumberFormat('en-US',{style:'currency',currency:currentCurrency,minimumFractionDigits:2}).format(v*r); }
+    function formatNumber(v){ return new Intl.NumberFormat().format(v); }
+
+    // ---------- GITHUB (full state) ----------
+    function getGitHubConfig(){ return { token: document.getElementById('githubToken').value, owner: document.getElementById('githubOwner').value, repo: document.getElementById('githubRepo').value, path: document.getElementById('githubPath').value }; }
+    async function githubAPI(endpoint, options={}){
+      const { token } = getGitHubConfig();
+      const res = await fetch(`https://api.github.com${endpoint}`, { ...options, headers: { 'Authorization': `Bearer ${token}`, 'Accept': 'application/vnd.github.v3+json', 'Content-Type': 'application/json', ...options.headers } });
+      if (!res.ok) throw new Error(`GitHub API ${res.status}`);
+      return res.json();
+    }
+    
+    function collectFullState() {
+      return {
+        clientName: document.getElementById('clientNameInput').value,
+        initialCapital: parseFloat(document.getElementById('initialCapitalInput').value) || 0,
+        currency: currentCurrency,
+        latestPrices: latestPrices,
+        transactions: transactions.map(t => ({
+          id: t.id, name: t.name, symbol: t.symbol, date: t.date, type: t.type, invType: t.invType,
+          qty: t.qty, unitCost: t.unitCost, fee: t.fee
+        }))
+      };
+    }
+
+    async function saveToGitHub(){
+      const cfg = getGitHubConfig(); if(!cfg.token||!cfg.owner||!cfg.repo) return alert('Fill GitHub config');
+      document.getElementById('githubStatus').textContent='Saving...';
+      try {
+        const state = collectFullState();
+        let sha=null; try{ const f=await githubAPI(`/repos/${cfg.owner}/${cfg.repo}/contents/${cfg.path}`); sha=f.sha; }catch(e){}
+        const content = btoa(unescape(encodeURIComponent(JSON.stringify(state, null, 2))));
+        await githubAPI(`/repos/${cfg.owner}/${cfg.repo}/contents/${cfg.path}`, { method:'PUT', body:JSON.stringify({ message:'Update portfolio state', content, ...(sha&&{sha}) }) });
+        document.getElementById('githubStatus').textContent='Saved ✓';
+      }catch(e){ document.getElementById('githubStatus').textContent='Error'; console.error(e); }
+    }
+
+    async function loadFromGitHub(){
+      const cfg = getGitHubConfig(); if(!cfg.token||!cfg.owner||!cfg.repo) return alert('Fill GitHub config');
+      document.getElementById('githubStatus').textContent='Loading...';
+      try {
+        const file = await githubAPI(`/repos/${cfg.owner}/${cfg.repo}/contents/${cfg.path}`);
+        const state = JSON.parse(decodeURIComponent(escape(atob(file.content))));
+        document.getElementById('clientNameInput').value = state.clientName || 'Ava Montgomery';
+        document.getElementById('initialCapitalInput').value = state.initialCapital || 18000000;
+        currentCurrency = state.currency || 'USD';
+        document.getElementById('currencySelect').value = currentCurrency;
+        latestPrices = state.latestPrices || defaultState.latestPrices;
+        transactions = (state.transactions || defaultState.transactions).map(t => {
+          const tc = t.qty * t.unitCost + t.fee;
+          return { ...t, totalCost: tc, avgUnitCost: tc / t.qty, selected: false };
+        });
+        document.getElementById('githubStatus').textContent='Loaded ✓';
+        buildPriceHistoryCache(); fullRefresh();
+      }catch(e){ document.getElementById('githubStatus').textContent='Error'; console.error(e); }
+    }
+    
+    function saveGitHubConfig(){ const c=getGitHubConfig(); localStorage.setItem('ghConfig',JSON.stringify(c)); alert('Config saved'); }
+    function loadGitHubConfig(){ const s=localStorage.getItem('ghConfig'); if(s){ const c=JSON.parse(s); document.getElementById('githubToken').value=c.token||''; document.getElementById('githubOwner').value=c.owner||''; document.getElementById('githubRepo').value=c.repo||''; document.getElementById('githubPath').value=c.path||'portfolio_state.json'; } }
+
+    // ---------- EXCEL EXPORT/IMPORT (SheetJS) ----------
+    function exportToXLS() {
+      const wsData = transactions.map(t => ({
+        ID: t.id,
+        Name: t.name,
+        Symbol: t.symbol,
+        Date: t.date,
+        Type: t.type,
+        'Inv Type': t.invType,
+        Quantity: t.qty,
+        'Unit Cost': t.unitCost,
+        Fee: t.fee,
+        'Total Cost': t.totalCost,
+        'Avg Cost': t.avgUnitCost
+      }));
+      const wb = XLSX.utils.book_new();
+      const ws = XLSX.utils.json_to_sheet(wsData);
+      XLSX.utils.book_append_sheet(wb, ws, 'Transactions');
+      XLSX.writeFile(wb, 'portfolio_transactions.xlsx');
+    }
+
+    function importFromXLS(file) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        try {
+          const data = new Uint8Array(e.target.result);
+          const wb = XLSX.read(data, { type: 'array' });
+          const sheet = wb.Sheets[wb.SheetNames[0]];
+          const rows = XLSX.utils.sheet_to_json(sheet);
+          if (rows.length === 0) return alert('No data found in Excel file.');
+          
+          const newTransactions = rows.map((row, idx) => {
+            const qty = parseFloat(row.Quantity) || 0;
+            const unitCost = parseFloat(row['Unit Cost']) || 0;
+            const fee = parseFloat(row.Fee) || 0;
+            const totalCost = qty * unitCost + fee;
+            return {
+              id: row.ID ? parseInt(row.ID) : (Math.max(...transactions.map(t=>t.id), 0) + 1 + idx),
+              name: row.Name || '',
+              symbol: row.Symbol || '',
+              date: row.Date || new Date().toISOString().slice(0,10),
+              type: row.Type || 'BUY',
+              invType: row['Inv Type'] || 'Stock',
+              qty: qty,
+              unitCost: unitCost,
+              fee: fee,
+              totalCost: totalCost,
+              avgUnitCost: totalCost / qty,
+              selected: false
+            };
+          });
+          
+          transactions = newTransactions;
+          // Force rebuild of price cache and full UI refresh
+          buildPriceHistoryCache();
+          fullRefresh();
+          alert(`Imported ${newTransactions.length} transactions.`);
+        } catch (err) {
+          alert('Error parsing Excel file: ' + err.message);
+        }
+      };
+      reader.readAsArrayBuffer(file);
+    }
+
+    // ---------- HOLDINGS & TRANSACTIONS ----------
+    function getInceptionDate(){ return transactions.length ? new Date(transactions.reduce((a,b)=>a.date<b.date?a:b).date) : new Date(); }
+    function buildPriceHistoryCache(){
+      priceHistoryCache.clear(); const inception=getInceptionDate(); const today=new Date(); const msPerDay=86400000;
+      const totalDays=Math.ceil((today-inception)/msPerDay)+1;
+      [...new Set(transactions.map(t=>t.symbol))].forEach(sym=>{
+        const base=latestPrices[sym]||100; let seed=sym.split('').reduce((a,c)=>a+c.charCodeAt(0),0); const prices=[]; let price=base;
+        for(let i=0;i<totalDays;i++){ seed=(seed*9301+49297)%233280; price*=(1+(seed/233280*0.04-0.02)); prices.push(price); }
+        priceHistoryCache.set(sym,prices.reverse());
+      });
+    }
+    function computeHoldings(){
+      const sorted=[...transactions].sort((a,b)=>a.date.localeCompare(b.date)); const map=new Map();
+      sorted.forEach(tx=>{
+        const sym=tx.symbol; if(!map.has(sym)) map.set(sym,{name:tx.name,type:tx.invType,units:0,costBasis:0,buyDate:tx.date});
+        const h=map.get(sym);
+        if(tx.type==='BUY'){ h.units+=tx.qty; h.costBasis+=tx.totalCost; if(tx.date<h.buyDate) h.buyDate=tx.date; }
+        else if(tx.type==='SELL'&&h.units>0){ const sellQty=Math.min(tx.qty,h.units); const avg=h.costBasis/h.units; h.units-=sellQty; h.costBasis=Math.max(0,h.costBasis-avg*sellQty); }
+      });
+      return Array.from(map.entries()).filter(([,h])=>h.units>0.001).map(([sym,h])=>{
+        const avg=h.costBasis/h.units; const price=latestPrices[sym]||avg; const mkt=h.units*price; const pl=mkt-h.costBasis;
+        return {...h, symbol:sym, avgCost:avg, latestPrice:price, marketValue:mkt, plValue:pl, plPercent:h.costBasis?pl/h.costBasis*100:0};
+      });
+    }
+    function renderHoldings(){
+      let data=computeHoldings();
+      if (holdingsSort.column) {
+        const col = holdingsSort.column;
+        data.sort((a,b) => {
+          let valA, valB;
+          if (col === 'name') { valA = a.name; valB = b.name; }
+          else if (col === 'type') { valA = a.type; valB = b.type; }
+          else if (col === 'symbol') { valA = a.symbol; valB = b.symbol; }
+          else if (col === 'units') { valA = a.units; valB = b.units; }
+          else if (col === 'buyDate') { valA = a.buyDate; valB = b.buyDate; }
+          else if (col === 'avgCost') { valA = a.avgCost; valB = b.avgCost; }
+          else if (col === 'totalCost') { valA = a.costBasis; valB = b.costBasis; }
+          else if (col === 'latestPrice') { valA = a.latestPrice; valB = b.latestPrice; }
+          else if (col === 'marketValue') { valA = a.marketValue; valB = b.marketValue; }
+          else if (col === 'plPercent') { valA = a.plPercent; valB = b.plPercent; }
+          else if (col === 'plValue') { valA = a.plValue; valB = b.plValue; }
+          else return 0;
+          if (typeof valA === 'string') return holdingsSort.asc ? valA.localeCompare(valB) : valB.localeCompare(valA);
+          return holdingsSort.asc ? valA - valB : valB - valA;
+        });
+      }
+      let html='', totalCost=0, totalMkt=0;
+      data.forEach(h=>{ totalCost+=h.costBasis; totalMkt+=h.marketValue; const plClass=h.plValue>=0?'positive':'negative';
+        html+=`<tr><td>${h.name}</td><td>${h.type}</td><td><span class="symbol-badge">${h.symbol}</span></td><td>${formatNumber(Math.round(h.units))}</td><td>${h.buyDate}</td><td>${formatCurrencyCents(h.avgCost)}</td><td>${formatCurrency(h.costBasis)}</td><td>${formatCurrencyCents(h.latestPrice)}</td><td>${formatCurrency(h.marketValue)}</td><td class="${plClass}">${h.plValue>=0?'+':''}${h.plPercent.toFixed(2)}%</td><td class="${plClass}">${h.plValue>=0?'+':''}${formatCurrency(h.plValue)}</td></tr>`; });
+      const totalPL=totalMkt-totalCost; const plPct=totalCost?totalPL/totalCost*100:0;
+      html+=`<tr class="total-row"><td><strong>TOTAL</strong></td><td></td><td></td><td></td><td></td><td></td><td><strong>${formatCurrency(totalCost)}</strong></td><td></td><td><strong>${formatCurrency(totalMkt)}</strong></td><td class="${totalPL>=0?'positive':'negative'}"><strong>${totalPL>=0?'+':''}${plPct.toFixed(2)}%</strong></td><td class="${totalPL>=0?'positive':'negative'}"><strong>${totalPL>=0?'+':''}${formatCurrency(totalPL)}</strong></td></tr>`;
+      document.getElementById('holdingsBody').innerHTML=html;
+      const initCap=parseFloat(document.getElementById('initialCapitalInput').value)||0;
+      const net=transactions.filter(t=>t.type==='BUY').reduce((s,t)=>s+t.totalCost,0)-transactions.filter(t=>t.type==='SELL').reduce((s,t)=>s+t.totalCost,0);
+      const cash=initCap-net; const portValue=cash+totalMkt;
+      document.getElementById('totalPortfolioValue').textContent=formatCurrency(portValue);
+      document.getElementById('totalPLValueDisplay').textContent=(totalPL>=0?'+':'')+formatCurrency(totalPL);
+      document.getElementById('totalPLPercentDisplay').textContent=(totalPL>=0?'+':'')+plPct.toFixed(2)+'%';
+      document.getElementById('outstandingCashDisplay').textContent=formatCurrency(cash);
+      updateExchangeRateDisplay();
+    }
+    function renderTransactions(){
+      let list=transactions.map((t,i)=>({...t, idx:i}));
+      if (txSort.column) {
+        const col = txSort.column;
+        list.sort((a,b) => {
+          let valA, valB;
+          if (col === 'no') { valA = a.idx; valB = b.idx; }
+          else if (col === 'name') { valA = a.name; valB = b.name; }
+          else if (col === 'symbol') { valA = a.symbol; valB = b.symbol; }
+          else if (col === 'date') { valA = a.date; valB = b.date; }
+          else if (col === 'type') { valA = a.type; valB = b.type; }
+          else if (col === 'invType') { valA = a.invType; valB = b.invType; }
+          else if (col === 'qty') { valA = a.qty; valB = b.qty; }
+          else if (col === 'unitCost') { valA = a.unitCost; valB = b.unitCost; }
+          else if (col === 'fee') { valA = a.fee; valB = b.fee; }
+          else if (col === 'totalCost') { valA = a.totalCost; valB = b.totalCost; }
+          else if (col === 'avgUnitCost') { valA = a.avgUnitCost; valB = b.avgUnitCost; }
+          else return 0;
+          if (typeof valA === 'string') return txSort.asc ? valA.localeCompare(valB) : valB.localeCompare(valA);
+          return txSort.asc ? valA - valB : valB - valA;
+        });
+      }
+      let html=''; list.forEach((tx,i)=>{ html+=`<tr><td><input type="checkbox" class="tx-checkbox" data-id="${tx.id}" ${tx.selected?'checked':''}></td><td>${i+1}</td><td><input value="${tx.name}" class="tx-name" style="width:110px"></td><td><input value="${tx.symbol}" class="tx-symbol" style="width:80px"></td><td><input type="date" value="${tx.date}" class="tx-date"></td><td><select class="tx-type">${['BUY','SELL'].map(o=>`<option ${tx.type===o?'selected':''}>${o}</option>`)}</select></td><td><select class="tx-invtype">${['Stock','ETF','Bond','Commodity'].map(o=>`<option ${tx.invType===o?'selected':''}>${o}</option>`)}</select></td><td><input type="number" value="${tx.qty}" class="tx-qty" style="width:90px"></td><td><input type="number" value="${tx.unitCost}" class="tx-unitcost" style="width:100px"></td><td><input type="number" value="${tx.fee}" class="tx-fee" style="width:80px"></td><td>${formatCurrency(tx.totalCost)}</td><td>${formatCurrencyCents(tx.avgUnitCost)}</td></tr>`; });
+      document.getElementById('transactionsBody').innerHTML=html;
+      document.querySelectorAll('.tx-checkbox').forEach(cb=>cb.addEventListener('change', function(){ const tx=transactions.find(t=>t.id===parseInt(this.dataset.id)); if(tx) tx.selected=this.checked; }));
+      document.querySelectorAll('.tx-name, .tx-symbol, .tx-date, .tx-qty, .tx-unitcost, .tx-fee, .tx-type, .tx-invtype').forEach(el=>el.addEventListener('change', function(){
+        const row=this.closest('tr'); const id=parseInt(row.querySelector('.tx-checkbox').dataset.id); const tx=transactions.find(t=>t.id===id); if(!tx)return;
+        if(this.classList.contains('tx-name')) tx.name=this.value; else if(this.classList.contains('tx-symbol')) tx.symbol=this.value;
+        else if(this.classList.contains('tx-date')) tx.date=this.value; else if(this.classList.contains('tx-qty')) tx.qty=parseFloat(this.value)||0;
+        else if(this.classList.contains('tx-unitcost')) tx.unitCost=parseFloat(this.value)||0; else if(this.classList.contains('tx-fee')) tx.fee=parseFloat(this.value)||0;
+        else if(this.classList.contains('tx-type')) tx.type=this.value; else if(this.classList.contains('tx-invtype')) tx.invType=this.value;
+        tx.totalCost=tx.qty*tx.unitCost+tx.fee; tx.avgUnitCost=tx.totalCost/tx.qty;
+        buildPriceHistoryCache(); fullRefresh();
+      }));
+    }
+    function fullRefresh(){ renderTransactions(); renderHoldings(); updateCharts(); }
+
+    // ---------- CHARTS ----------
+    const timeframes=['1D','1W','1M','3M','6M','9M','YTD','1Y','2Y','3Y','5Y','MAX'];
+    function generateHistory(tf){
+      const inception=getInceptionDate(); const today=new Date(); let start=new Date(today);
+      if(tf==='1D') start.setDate(today.getDate()-1); else if(tf==='1W') start.setDate(today.getDate()-7); else if(tf==='1M') start.setMonth(today.getMonth()-1); else if(tf==='3M') start.setMonth(today.getMonth()-3); else if(tf==='6M') start.setMonth(today.getMonth()-6); else if(tf==='9M') start.setMonth(today.getMonth()-9); else if(tf==='YTD') start=new Date(today.getFullYear(),0,1); else if(tf==='1Y') start.setFullYear(today.getFullYear()-1); else if(tf==='2Y') start.setFullYear(today.getFullYear()-2); else if(tf==='3Y') start.setFullYear(today.getFullYear()-3); else if(tf==='5Y') start.setFullYear(today.getFullYear()-5); else if(tf==='MAX') start=new Date(inception);
+      if(start<inception) start=new Date(inception);
+      const msPerDay=86400000; const days=Math.ceil((today-start)/msPerDay); const offset=Math.ceil((start-inception)/msPerDay);
+      const labels=[], vals=[], pls=[]; const sorted=[...transactions].sort((a,b)=>a.date.localeCompare(b.date)); const initCap=parseFloat(document.getElementById('initialCapitalInput').value)||0;
+      for(let i=0;i<=days;i++){
+        const d=new Date(start); d.setDate(start.getDate()+i); labels.push(d.toLocaleDateString('en-US',{year:'numeric',month:'short',day:'numeric'}));
+        const map=new Map(); let net=0;
+        sorted.filter(tx=>new Date(tx.date)<=d).forEach(tx=>{
+          const sym=tx.symbol; if(!map.has(sym)) map.set(sym,{units:0,costBasis:0}); const h=map.get(sym);
+          if(tx.type==='BUY'){ h.units+=tx.qty; h.costBasis+=tx.totalCost; net+=tx.totalCost; }
+          else if(tx.type==='SELL'&&h.units>0){ const sq=Math.min(tx.qty,h.units); const avg=h.costBasis/h.units; h.costBasis-=avg*sq; h.units-=sq; net-=tx.totalCost; }
+        });
+        let mkt=0, cost=0;
+        for(let [sym,h] of map.entries()){ if(h.units<=0)continue; const hist=priceHistoryCache.get(sym)||[]; const p=hist[offset+i]||latestPrices[sym]; mkt+=h.units*p; cost+=h.costBasis; }
+        vals.push((initCap-net)+mkt); pls.push(mkt-cost);
+      }
+      return {labels, vals, pls};
+    }
+    function updateCharts(){
+      const vData=generateHistory(valueTimeframe); if(valueChart){ valueChart.data.labels=vData.labels; valueChart.data.datasets[0].data=vData.vals; valueChart.update(); } else { valueChart=new Chart(document.getElementById('valueChart'),{type:'line',data:{labels:vData.labels,datasets:[{label:'Portfolio Value',data:vData.vals,borderColor:'#1a4cff',tension:0.2}]}}); }
+      const pData=generateHistory(plTimeframe); if(plChart){ plChart.data.labels=pData.labels; plChart.data.datasets[0].data=pData.pls; plChart.update(); } else { plChart=new Chart(document.getElementById('plChart'),{type:'line',data:{labels:pData.labels,datasets:[{label:'P/L',data:pData.pls,borderColor:'#0e8240',tension:0.2}]}}); }
+    }
+    function setupTimeframes(){
+      const vc=document.getElementById('valueTimeframe'), pc=document.getElementById('plTimeframe');
+      [vc,pc].forEach((c,idx)=>{ c.innerHTML=''; timeframes.forEach(tf=>{ const btn=document.createElement('button'); btn.className='timeframe-btn'+( (idx===0?valueTimeframe:plTimeframe)===tf?' active':''); btn.textContent=tf; btn.onclick=()=>{ if(idx===0) valueTimeframe=tf; else plTimeframe=tf; c.querySelectorAll('.timeframe-btn').forEach(b=>b.classList.remove('active')); btn.classList.add('active'); updateCharts(); }; c.appendChild(btn); }); });
+    }
+
+    // ---------- API: LIVE PRICES ----------
+    async function fetchLivePrices() {
+      const apiKey = localStorage.getItem('twelveDataApiKey');
+      if (!apiKey) { alert('Please enter and save Twelve Data API Key'); return; }
+      const status = document.getElementById('priceStatus');
+      status.style.display = 'inline-block'; status.textContent = 'Fetching stocks...';
+      const symbols = [...new Set(transactions.map(t => t.symbol))];
+      for (const sym of symbols) {
+        try {
+          const url = `https://api.twelvedata.com/quote?symbol=${sym}&apikey=${apiKey}`;
+          const res = await fetch(url); const data = await res.json();
+          if (data && data.close) latestPrices[sym] = parseFloat(data.close);
+          await new Promise(r => setTimeout(r, 250));
+        } catch(e) { console.warn(`Failed ${sym}`); }
+      }
+      status.textContent = 'Fetching indices...';
+      const indices = [
+        { sym: '^GSPC', id: 'sp500', pts: 'sp500Points', chg: 'sp500Change' },
+        { sym: '^IXIC', id: 'nasdaq', pts: 'nasdaqPoints', chg: 'nasdaqChange' },
+        { sym: '^DJI', id: 'dow', pts: 'dowPoints', chg: 'dowChange' },
+        { sym: '^VIX', id: 'vix', pts: 'vixPoints', chg: 'vixChange' }
+      ];
+      for (const idx of indices) {
+        try {
+          const url = `https://query1.finance.yahoo.com/v8/finance/chart/${idx.sym}`;
+          const proxy = `https://corsproxy.io/?${encodeURIComponent(url)}`;
+          const res = await fetch(proxy); const data = await res.json();
+          if (data.chart?.result?.[0]) {
+            const meta = data.chart.result[0].meta;
+            const price = meta.regularMarketPrice;
+            const prev = meta.previousClose;
+            if (price) {
+              document.getElementById(idx.id).textContent = price.toFixed(2);
+              if (prev) {
+                const ptsChange = price - prev;
+                const pctChange = (ptsChange / prev) * 100;
+                const ptsEl = document.getElementById(idx.pts);
+                const chgEl = document.getElementById(idx.chg);
+                ptsEl.textContent = (ptsChange>=0?'+':'') + ptsChange.toFixed(2);
+                chgEl.textContent = (pctChange>=0?'+':'') + pctChange.toFixed(2) + '%';
+                const cls = ptsChange >= 0 ? 'positive' : 'negative';
+                ptsEl.className = cls;
+                chgEl.className = cls;
+              }
+            }
+          }
+        } catch(e) {}
+        await new Promise(r => setTimeout(r, 200));
+      }
+      try {
+        const res = await fetch('https://api.exchangerate-api.com/v4/latest/USD');
+        const data = await res.json();
+        if (data.rates) {
+          currencyRates.USD = 1;
+          currencyRates.SGD = data.rates.SGD || 1.35;
+          currencyRates.HKD = data.rates.HKD || 7.82;
+          currencyRates.MYR = data.rates.MYR || 4.72;
+        }
+      } catch(e) {}
+      buildPriceHistoryCache();
+      status.textContent = 'Updated'; setTimeout(() => status.style.display = 'none', 2000);
+      fullRefresh();
+    }
+
+    // ---------- API: NEWS ----------
+    async function fetchNews() {
+      const apiKey = localStorage.getItem('marketauxApiKey');
+      if (!apiKey) { alert('Please enter and save MarketAux API Key'); return; }
+      const newsBody = document.getElementById('newsBody');
+      newsBody.innerHTML = '<tr><td colspan="4">Loading news...</td></tr>';
+      const holdings = computeHoldings();
+      const symbols = [...new Set(holdings.map(h => h.symbol))].join(',');
+      const url = `https://api.marketaux.com/v1/news/all?symbols=${symbols}&filter_entities=true&language=en&api_token=${apiKey}`;
+      try {
+        const res = await fetch(url); const data = await res.json();
+        if (data.data && data.data.length) {
+          let html = '';
+          data.data.slice(0,15).forEach(a => {
+            const syms = a.entities.map(e => e.symbol).join(', ');
+            const sentiment = a.entities[0]?.sentiment_score;
+            let sentHtml = 'N/A';
+            if (sentiment !== undefined) {
+              const cls = sentiment > 0.2 ? 'positive' : (sentiment < -0.2 ? 'negative' : '');
+              sentHtml = `<span class="${cls}">${sentiment.toFixed(2)}</span>`;
+            }
+            html += `<tr><td><span class="symbol-badge">${syms}</span></td><td><a href="${a.url}" target="_blank">${a.title}</a><br><small>${a.source}</small></td><td>${sentHtml}</td><td>${new Date(a.published_at).toLocaleString()}</td></tr>`;
+          });
+          newsBody.innerHTML = html;
+        } else { newsBody.innerHTML = '<tr><td colspan="4">No news found</td></tr>'; }
+      } catch(e) { newsBody.innerHTML = '<tr><td colspan="4">Error loading news</td></tr>'; }
+    }
+
+    function saveTwelveDataKey() {
+      const key = document.getElementById('apiKeyInput').value.trim();
+      if (key) { localStorage.setItem('twelveDataApiKey', key); document.getElementById('apiKeyStatus').innerHTML='<i class="fas fa-check-circle" style="color:green;"></i>'; }
+    }
+    function saveMarketAuxKey() {
+      const key = document.getElementById('marketauxApiKeyInput').value.trim();
+      if (key) { localStorage.setItem('marketauxApiKey', key); document.getElementById('marketauxApiKeyStatus').innerHTML='<i class="fas fa-check-circle" style="color:green;"></i>'; }
+    }
+
+    // ---------- INIT ----------
+    function init(){
+      updateDateDisplay(); loadGitHubConfig();
+      if (transactions.length === 0) {
+        transactions = defaultState.transactions.map(t => { const tc = t.qty * t.unitCost + t.fee; return {...t, totalCost: tc, avgUnitCost: tc / t.qty, selected: false}; });
+        latestPrices = defaultState.latestPrices;
+      }
+      buildPriceHistoryCache(); fullRefresh(); setupTimeframes();
+      document.getElementById('saveToGitHubBtn').onclick=saveToGitHub;
+      document.getElementById('loadFromGitHubBtn').onclick=loadFromGitHub;
+      document.getElementById('saveGitHubConfigBtn').onclick=saveGitHubConfig;
+      document.getElementById('fetchLivePricesBtn').onclick=fetchLivePrices;
+      document.getElementById('fetchNewsBtn').onclick=fetchNews;
+      document.getElementById('saveApiKeyBtn').onclick=saveTwelveDataKey;
+      document.getElementById('saveMarketauxApiKeyBtn').onclick=saveMarketAuxKey;
+      document.getElementById('simulatePricesBtn').onclick=()=>{ for(let s in latestPrices) latestPrices[s]*=(1+(Math.random()*0.06-0.03)); buildPriceHistoryCache(); fullRefresh(); };
+      document.getElementById('addTransactionBtn').onclick=()=>{ const id=Math.max(...transactions.map(t=>t.id),0)+1; transactions.push({id,name:'New',symbol:'SYM',date:new Date().toISOString().slice(0,10),type:'BUY',invType:'Stock',qty:100,unitCost:100,fee:1,totalCost:10001,avgUnitCost:100.01,selected:false}); buildPriceHistoryCache(); fullRefresh(); };
+      document.getElementById('deleteSelectedBtn').onclick=()=>{ transactions=transactions.filter(t=>!t.selected); buildPriceHistoryCache(); fullRefresh(); };
+      document.getElementById('exportXLSBtn').onclick=exportToXLS;
+      document.getElementById('xlsFileInput').addEventListener('change', e=>{ if(e.target.files[0]){ importFromXLS(e.target.files[0]); e.target.value=''; } });
+      document.getElementById('selectAllTx').onchange=e=>{ transactions.forEach(t=>t.selected=e.target.checked); renderTransactions(); };
+      document.getElementById('refreshHoldingsFromTxBtn').onclick=()=>{ buildPriceHistoryCache(); fullRefresh(); };
+      document.getElementById('currencySelect').onchange=e=>{ currentCurrency=e.target.value; fullRefresh(); };
+      document.querySelectorAll('#holdingsHeaderRow th[data-sort]').forEach(th=>th.addEventListener('click', ()=>{
+        const col=th.dataset.sort; if(holdingsSort.column===col) holdingsSort.asc=!holdingsSort.asc; else { holdingsSort.column=col; holdingsSort.asc=true; } renderHoldings();
+      }));
+      document.querySelectorAll('#txHeaderRow th[data-sort]').forEach(th=>th.addEventListener('click', ()=>{
+        const col=th.dataset.sort; if(txSort.column===col) txSort.asc=!txSort.asc; else { txSort.column=col; txSort.asc=true; } renderTransactions();
+      }));
+      const savedTwelve=localStorage.getItem('twelveDataApiKey'); if(savedTwelve) document.getElementById('apiKeyInput').value=savedTwelve;
+      const savedMA=localStorage.getItem('marketauxApiKey'); if(savedMA) document.getElementById('marketauxApiKeyInput').value=savedMA;
+    }
+    init();
+  })();
+</script>
+</body>
+</html>
