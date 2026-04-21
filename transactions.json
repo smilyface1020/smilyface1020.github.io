@@ -1,0 +1,54 @@
+[
+  {
+    "id": 1,
+    "name": "Microsoft",
+    "symbol": "MSFT",
+    "date": "2025-08-10",
+    "type": "BUY",
+    "invType": "Stock",
+    "qty": 15000,
+    "unitCost": 380,
+    "fee": 10,
+    "totalCost": 5700010,
+    "avgUnitCost": 380.0006666666667
+  },
+  {
+    "id": 2,
+    "name": "Apple",
+    "symbol": "AAPL",
+    "date": "2025-09-15",
+    "type": "BUY",
+    "invType": "Stock",
+    "qty": 22000,
+    "unitCost": 175,
+    "fee": 15,
+    "totalCost": 3850015,
+    "avgUnitCost": 175.00068181818182
+  },
+  {
+    "id": 3,
+    "name": "NVIDIA",
+    "symbol": "NVDA",
+    "date": "2025-10-01",
+    "type": "BUY",
+    "invType": "Stock",
+    "qty": 8000,
+    "unitCost": 850,
+    "fee": 12,
+    "totalCost": 6800012,
+    "avgUnitCost": 850.0015
+  },
+  {
+    "id": 4,
+    "name": "NVIDIA",
+    "symbol": "NVDA",
+    "date": "2026-04-15",
+    "type": "SELL",
+    "invType": "Stock",
+    "qty": 100,
+    "unitCost": 900,
+    "fee": 10,
+    "totalCost": 90010,
+    "avgUnitCost": 900.1
+  }
+]
