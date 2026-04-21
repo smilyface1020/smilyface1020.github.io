@@ -41,7 +41,7 @@
   {
     "id": 4,
     "name": "Broadcom",
-    "symbol": "Broadcom",
+    "symbol": "AVGO",
     "date": "2026-03-10",
     "type": "BUY",
     "invType": "Stock",
@@ -54,7 +54,7 @@
   {
     "id": 5,
     "name": "Broadcom",
-    "symbol": "SYM",
+    "symbol": "AVGO",
     "date": "2026-04-21",
     "type": "SELL",
     "invType": "Stock",
