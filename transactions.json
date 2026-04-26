@@ -13,7 +13,8 @@
     "VTI": 360.1172168770505,
     "AVGO": 422.76001,
     "MAGS": 66.57,
-    "QQQ": 663.88
+    "QQQ": 663.88,
+    "MCHI": 57.81
   },
   "transactions": [
     {
@@ -139,8 +140,8 @@
     },
     {
       "id": 12,
-      "name": "iShares Treasury",
-      "symbol": "IEF",
+      "name": "iShares MSCI China ETF",
+      "symbol": "MCHI",
       "date": "2026-04-12",
       "type": "BUY",
       "invType": "Stock",
