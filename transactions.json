@@ -63,8 +63,8 @@
     },
     {
       "id": 5,
-      "name": "iShares Treasury",
-      "symbol": "IEF",
+      "name": "iShares MSCI China ETF",
+      "symbol": "MCHI",
       "date": "2026-04-10",
       "type": "BUY",
       "invType": "Stock",
