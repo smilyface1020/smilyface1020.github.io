@@ -1,16 +1,19 @@
 {
-  "clientName": "Queeniesiew",
+  "clientName": "Queenniesiew",
   "initialCapital": 5125,
   "currency": "USD",
   "latestPrices": {
-    "MSFT": 363.6100161663729,
-    "AAPL": 276.8160596451635,
-    "NVDA": 204.95448159343772,
-    "IEF": 98.57494697936505,
+    "MSFT": 424.62,
+    "AAPL": 271.059998,
+    "NVDA": 208.27,
+    "IEF": 95.56,
     "GLD": 453.7220848304988,
     "GOOGL": 314.58159205993604,
     "PIMIX": 11.19299520610012,
-    "VTI": 360.1172168770505
+    "VTI": 360.1172168770505,
+    "AVGO": 422.76001,
+    "MAGS": 66.57,
+    "QQQ": 663.88
   },
   "transactions": [
     {
