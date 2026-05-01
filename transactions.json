@@ -1,11 +1,11 @@
 {
-  "clientName": "Queenniesiew",
+  "clientName": "Queennie Siew",
   "initialCapital": 5125,
   "currency": "USD",
   "latestPrices": {
-    "MSFT": 372.38,
-    "AAPL": 273.15,
-    "NVDA": 201.68,
+    "MSFT": 416.395,
+    "AAPL": 284.51,
+    "NVDA": 199.365,
     "IEF": 95.25,
     "GLD": 440.99,
     "GOOGL": 317.24,
@@ -67,6 +67,39 @@
       "qty": 12300,
       "unitCost": 215.4,
       "fee": 10
+    },
+    {
+      "id": 6,
+      "name": "New",
+      "symbol": "SYM",
+      "date": "2026-05-01",
+      "type": "BUY",
+      "invType": "Stock",
+      "qty": 100,
+      "unitCost": 100,
+      "fee": 1
+    },
+    {
+      "id": 7,
+      "name": "New",
+      "symbol": "SYM",
+      "date": "2026-05-01",
+      "type": "BUY",
+      "invType": "Stock",
+      "qty": 100,
+      "unitCost": 100,
+      "fee": 1
+    },
+    {
+      "id": 8,
+      "name": "New",
+      "symbol": "SYM",
+      "date": "2026-05-01",
+      "type": "BUY",
+      "invType": "Stock",
+      "qty": 100,
+      "unitCost": 100,
+      "fee": 1
     }
   ]
 }
