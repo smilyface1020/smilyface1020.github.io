@@ -3,103 +3,163 @@
   "initialCapital": 5125,
   "currency": "USD",
   "latestPrices": {
-    "MSFT": 416.395,
-    "AAPL": 284.51,
-    "NVDA": 199.365,
-    "IEF": 95.25,
-    "GLD": 440.99,
+    "MSFT": 413.62,
+    "AAPL": 276.82999,
+    "NVDA": 198.48,
+    "IEF": 94.39,
+    "GLD": 414.70999,
     "GOOGL": 317.24,
     "PIMIX": 10.88,
-    "VTI": 350.43
+    "VTI": 350.43,
+    "SYM": 57,
+    "AVGO": 416.5,
+    "MCHI": 57.3,
+    "MAGS": 66.97,
+    "QQQ": 672.88
   },
   "transactions": [
     {
       "id": 1,
       "name": "Microsoft",
       "symbol": "MSFT",
-      "date": "2025-08-10",
+      "date": "2026-04-09",
       "type": "BUY",
       "invType": "Stock",
-      "qty": 15000,
-      "unitCost": 380,
-      "fee": 10
+      "qty": 0.2721,
+      "unitCost": 367.42,
+      "fee": 1.24
     },
     {
       "id": 2,
       "name": "Apple",
       "symbol": "AAPL",
-      "date": "2025-09-15",
+      "date": "2026-04-09",
       "type": "BUY",
       "invType": "Stock",
-      "qty": 22000,
-      "unitCost": 175,
-      "fee": 15
+      "qty": 0.3878,
+      "unitCost": 257.82,
+      "fee": 1.24
     },
     {
       "id": 3,
       "name": "NVIDIA",
       "symbol": "NVDA",
-      "date": "2025-10-01",
+      "date": "2026-04-07",
       "type": "BUY",
       "invType": "Stock",
-      "qty": 8000,
-      "unitCost": 850,
-      "fee": 12
+      "qty": 0.285,
+      "unitCost": 175.39,
+      "fee": 0.74
     },
     {
       "id": 4,
-      "name": "iShares Treasury",
-      "symbol": "IEF",
-      "date": "2025-11-10",
+      "name": "Broadcom",
+      "symbol": "AVGO",
+      "date": "2026-04-09",
       "type": "BUY",
-      "invType": "ETF",
-      "qty": 40000,
-      "unitCost": 94,
-      "fee": 8
+      "invType": "Stock",
+      "qty": 0.5667,
+      "unitCost": 352.86,
+      "fee": 1.24
     },
     {
       "id": 5,
-      "name": "SPDR Gold",
-      "symbol": "GLD",
-      "date": "2026-01-18",
+      "name": "iShares MSCI China ETF",
+      "symbol": "MCHI",
+      "date": "2026-04-10",
       "type": "BUY",
-      "invType": "Commodity",
-      "qty": 12300,
-      "unitCost": 215.4,
-      "fee": 10
+      "invType": "Stock",
+      "qty": 2.6073,
+      "unitCost": 57.53,
+      "fee": 1.54
     },
     {
       "id": 6,
-      "name": "New",
-      "symbol": "SYM",
-      "date": "2026-05-01",
+      "name": "Roundmill",
+      "symbol": "MAGS",
+      "date": "2026-04-10",
       "type": "BUY",
       "invType": "Stock",
-      "qty": 100,
-      "unitCost": 100,
-      "fee": 1
+      "qty": 2.4469,
+      "unitCost": 61.2999,
+      "fee": 1.54
     },
     {
       "id": 7,
-      "name": "New",
-      "symbol": "SYM",
-      "date": "2026-05-01",
+      "name": "Invesco QQQ Trust",
+      "symbol": "QQQ",
+      "date": "2026-04-10",
       "type": "BUY",
       "invType": "Stock",
-      "qty": 100,
-      "unitCost": 100,
-      "fee": 1
+      "qty": 0.2448,
+      "unitCost": 612.6,
+      "fee": 1.24
     },
     {
       "id": 8,
-      "name": "New",
-      "symbol": "SYM",
-      "date": "2026-05-01",
+      "name": "Microsoft",
+      "symbol": "MSFT",
+      "date": "2026-04-10",
       "type": "BUY",
       "invType": "Stock",
-      "qty": 100,
-      "unitCost": 100,
-      "fee": 1
+      "qty": 0.7973,
+      "unitCost": 373.74,
+      "fee": 1.49
+    },
+    {
+      "id": 9,
+      "name": "Microsoft",
+      "symbol": "MSFT",
+      "date": "2026-04-10",
+      "type": "BUY",
+      "invType": "Stock",
+      "qty": 0.8036,
+      "unitCost": 373.32,
+      "fee": 1.49
+    },
+    {
+      "id": 10,
+      "name": "Apple",
+      "symbol": "AAPL",
+      "date": "2026-04-10",
+      "type": "BUY",
+      "invType": "Stock",
+      "qty": 1.1454,
+      "unitCost": 261.905,
+      "fee": 1.83
+    },
+    {
+      "id": 11,
+      "name": "NVIDIA",
+      "symbol": "NVDA",
+      "date": "2026-04-10",
+      "type": "BUY",
+      "invType": "Stock",
+      "qty": 1.5932,
+      "unitCost": 188.29,
+      "fee": 1.58
+    },
+    {
+      "id": 12,
+      "name": "iShares MSCI China ETF",
+      "symbol": "MCHI",
+      "date": "2026-04-12",
+      "type": "BUY",
+      "invType": "Stock",
+      "qty": 4.3959,
+      "unitCost": 56.87,
+      "fee": 1.57
+    },
+    {
+      "id": 13,
+      "name": "Apple",
+      "symbol": "AAPL",
+      "date": "2026-04-14",
+      "type": "BUY",
+      "invType": "Stock",
+      "qty": 0.9598,
+      "unitCost": 260.45,
+      "fee": 1.24
     }
   ]
 }
