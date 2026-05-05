@@ -3,20 +3,20 @@
   "initialCapital": 5125,
   "currency": "USD",
   "latestPrices": {
-    "MSFT": 413.62,
-    "AAPL": 276.82999,
-    "NVDA": 198.48,
+    "MSFT": 415.05,
+    "AAPL": 279.1,
+    "NVDA": 199.21,
     "IEF": 94.39,
     "GLD": 414.70999,
     "GOOGL": 317.24,
     "PIMIX": 10.88,
     "VTI": 350.43,
     "SYM": 57,
-    "AVGO": 416.5,
-    "MCHI": 57.3,
-    "MAGS": 66.97,
-    "QQQ": 672.88,
-    "META": 610.40997
+    "AVGO": 420.66,
+    "MCHI": 57.5,
+    "MAGS": 67.59,
+    "QQQ": 678.72,
+    "META": 608.9
   },
   "transactions": [
     {
