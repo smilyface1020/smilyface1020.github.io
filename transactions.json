@@ -160,6 +160,39 @@
       "qty": 0.9598,
       "unitCost": 260.45,
       "fee": 1.24
+    },
+    {
+      "id": 14,
+      "name": "Broadcom",
+      "symbol": "AVGO",
+      "date": "2026-04-28",
+      "type": "BUY",
+      "invType": "Stock",
+      "qty": 0.5042,
+      "unitCost": 396.64,
+      "fee": 1.24
+    },
+    {
+      "id": 15,
+      "name": "Invesco QQQ",
+      "symbol": "QQQ",
+      "date": "2026-04-28",
+      "type": "BUY",
+      "invType": "Stock",
+      "qty": 0.3054,
+      "unitCost": 654.86,
+      "fee": 1.24
+    },
+    {
+      "id": 16,
+      "name": "META Platforms",
+      "symbol": "META",
+      "date": "2026-04-30",
+      "type": "BUY",
+      "invType": "Stock",
+      "qty": 0.3302,
+      "unitCost": 605.62,
+      "fee": 1.24
     }
   ]
 }
